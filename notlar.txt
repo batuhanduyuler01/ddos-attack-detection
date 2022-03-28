@@ -1,0 +1,5 @@
+2019 CIC Veri setlerinde, genel olarak veri çok büyük. Bunun dışında Saldırı&Normal trafik durumlarını
+incelediğimizde verisetinde %95+ seviyesinde saldırı verisi bulunduğundan eğitimde bir overfitting'e sebep olabilir.
+
+Bu sebeple 2015 CıC veri setiyle devam etmek daha mantıklı gibi. Bu veriseti ise process edilmiş sayılır.
+Bu veri setiyle ilerlemek daha mantıklı gibi. Hem Monday Veriseti hem Friday veriseti kullanılacak. validation için ayrı sample'lar alınabilir.
