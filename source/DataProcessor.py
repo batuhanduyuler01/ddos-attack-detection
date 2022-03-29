@@ -72,7 +72,8 @@ class DataProcessor:
         bestFeatures = SelectKBest(score_func=chi2, k=20)
         featureSpace = dataframe.drop([" Label"], axis=1)
 
-        df = self.label_encoder(dataframe)
+        # df = self.label_encoder(dataframe)
+        df = self.labelDependentVariables(dataframe)
         dependentVariable = df[" Label"]
 
         fit = bestFeatures.fit(featureSpace, dependentVariable)
@@ -94,4 +95,9 @@ class DataProcessor:
     def label_encoder(self, dataframe: pd.DataFrame) -> pd.DataFrame:
         labelEncoder = LabelEncoder()
         dataframe[" Label"] = labelEncoder.fit_transform(dataframe[" Label"])
+        return dataframe
+
+    def labelDependentVariables(self, dataframe: pd.DataFrame) -> pd.DataFrame:
+        dataframe[" Label"].replace("BENIGN", 0)
+        dataframe[" Label"].replace("DDoS", 1)
         return dataframe
