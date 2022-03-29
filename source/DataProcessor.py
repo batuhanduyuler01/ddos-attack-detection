@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import chi2
 from sklearn.preprocessing import LabelEncoder
+import seaborn as sns
 
 
 class DataProcessor:
@@ -67,17 +68,30 @@ class DataProcessor:
 
         return self.__clean_data_col_based(df)
 
-    def chi_square_feature_selector(self, dataframe: pd.DataFrame, nLargest: int = 10) -> None:
+    def chi_square_feature_selector(self, dataframe: pd.DataFrame, nLargest: int = 10) -> pd.DataFrame:
         bestFeatures = SelectKBest(score_func=chi2, k=20)
         featureSpace = dataframe.drop([" Label"], axis=1)
 
-        labelEncoder = LabelEncoder()
-        dependentVariable = labelEncoder.fit_transform(dataframe[" Label"])
+        df = self.label_encoder(dataframe)
+        dependentVariable = df[" Label"]
 
         fit = bestFeatures.fit(featureSpace, dependentVariable)
         featureScores = pd.concat([pd.DataFrame(
             featureSpace.columns), pd.DataFrame(fit.scores_)], axis=1)
         featureScores.columns = ['Specs', 'Score']
+
+        print("Output of ChiSquare Feature Selector")
         print(featureScores.nlargest(nLargest, 'Score'))
 
-        return featureScores
+        return featureScores.nlargest(nLargest, 'Score')
+
+    def print_correlation_matrix(self, dataframe: pd.DataFrame) -> None:
+        correlationMatrix = dataframe.corr()
+        plt.figure(figsize=(20, 20))
+        sns.heatmap(correlationMatrix, annot=True)
+        plt.show()
+
+    def label_encoder(self, dataframe: pd.DataFrame) -> pd.DataFrame:
+        labelEncoder = LabelEncoder()
+        dataframe[" Label"] = labelEncoder.fit_transform(dataframe[" Label"])
+        return dataframe
