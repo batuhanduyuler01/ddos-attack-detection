@@ -2,8 +2,10 @@ from MethodBuilder import MethodBuilder
 import pandas as pd
 import numpy as np
 from sklearn.svm import SVC
-from sklearn.naive_bayes import GaussianNB
+from sklearn.naive_bayes import GaussianNB as GNB
 from sklearn.metrics import confusion_matrix
+from diffprivlib.models import GaussianNB as DifferentialGNB
+from diffprivlib.models import KMeans as DifferentialKmeans
 import time
 
 
@@ -45,12 +47,30 @@ class MLMethodBuilder(MethodBuilder):
         if (False == MethodBuilder.is_data_splitted(self)):
             MethodBuilder.split_data(self)
 
-        gnb = GaussianNB()
+        gnb = GNB()
         gnb.fit(self.xTrain.values, self.yTrain.values)
         predictions = gnb.predict(self.xTest.values)
 
         endTime = time.time()
         print(f'NaiveBayes Results calculated in: {endTime - startingTime} s')
+
+        print(
+            f'Confusion Matrix of Naive Bayes Classifier: \n {confusion_matrix(self.yTest, predictions)}')
+
+        MethodBuilder.metrics_calculator(
+            predictions, self.yTest.reset_index().values[:, 1])
+
+    def DifferentialNaiveBayes(self) -> None: 
+        #Differential Privacy Naive Bayes with IBM diffpriv framework
+        startingTime = time.time()
+        if (False == MethodBuilder.is_data_splitted(self)):
+            MethodBuilder.split_data(self)
+        diffGNB = DifferentialGNB()
+        diffGNB.fit(self.xTrain.values, self.yTrain.values)
+        predictions = diffGNB.predict(self.xTest.values)
+
+        endTime = time.time()
+        print(f'Differential NaiveBayes Results calculated in: {endTime - startingTime} s')
 
         print(
             f'Confusion Matrix of Naive Bayes Classifier: \n {confusion_matrix(self.yTest, predictions)}')
