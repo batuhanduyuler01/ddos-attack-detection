@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB as GNB
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import confusion_matrix
 from diffprivlib.models import GaussianNB as DifferentialGNB
 from diffprivlib.models import KMeans as DifferentialKmeans
@@ -39,6 +40,23 @@ class MLMethodBuilder(MethodBuilder):
 
         MethodBuilder.metrics_calculator(
             predictions, self.yTest.reset_index().values[:, 1])
+
+    def DecisionTreeClassifier(self) -> None :
+        startingTime = time.time()
+
+        if (False == MethodBuilder.is_data_splitted(self)):
+            MethodBuilder.split_data(self)
+
+        self.decisionTreeClassifier = DecisionTreeClassifier()
+        self.decisionTreeClassifier.fit(self.xTrain.values, self.yTrain.values)
+
+        predictions = self.decisionTreeClassifier.predict(self.xTest.values)
+
+        endTime = time.time()
+        print(f'Decision Tree Classifier Results calculated in: {endTime - startingTime} s')
+
+        self.print_results(self.yTest.values, predictions, "Decision Tree Classifier")
+        pass
 
     def NaiveBayes(self) -> None:
         # Naive Bayes algoritması
@@ -77,3 +95,10 @@ class MLMethodBuilder(MethodBuilder):
 
         MethodBuilder.metrics_calculator(
             predictions, self.yTest.reset_index().values[:, 1])
+
+    def print_results(self, yTest, predictions, algorithmName) :
+        print(
+            f'Confusion Matrix of {algorithmName}: \n {confusion_matrix(yTest, predictions)}')
+
+        MethodBuilder.metrics_calculator(
+            predictions, list(yTest))
